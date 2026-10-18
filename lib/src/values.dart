@@ -44,6 +44,7 @@ sealed class GrafileValue {
 
 /// Cypher `null`.
 final class GrafileNull extends GrafileValue {
+  /// Creates the null value.
   const GrafileNull();
 
   @override
@@ -61,8 +62,10 @@ final class GrafileNull extends GrafileValue {
 
 /// Cypher integer.
 final class GrafileInt extends GrafileValue {
+  /// Creates an integer value.
   const GrafileInt(this.value);
 
+  /// The integer value.
   final int value;
 
   @override
@@ -80,8 +83,10 @@ final class GrafileInt extends GrafileValue {
 
 /// Cypher float.
 final class GrafileDouble extends GrafileValue {
+  /// Creates a floating-point value.
   const GrafileDouble(this.value);
 
+  /// The floating-point value.
   final double value;
 
   @override
@@ -100,8 +105,10 @@ final class GrafileDouble extends GrafileValue {
 
 /// Cypher string.
 final class GrafileText extends GrafileValue {
+  /// Creates a string value.
   const GrafileText(this.value);
 
+  /// The string value.
   final String value;
 
   @override
@@ -120,8 +127,10 @@ final class GrafileText extends GrafileValue {
 
 /// Cypher boolean.
 final class GrafileBool extends GrafileValue {
+  /// Creates a boolean value.
   const GrafileBool(this.value);
 
+  /// The boolean value.
   final bool value;
 
   @override
@@ -141,8 +150,10 @@ final class GrafileBool extends GrafileValue {
 /// Cypher bytes. The native JSON serializers render bytes as `"0x…"`; the
 /// driver decodes them back into raw bytes.
 final class GrafileBlob extends GrafileValue {
+  /// Creates a bytes value.
   const GrafileBlob(this.bytes);
 
+  /// The raw bytes.
   final Uint8List bytes;
 
   @override
@@ -168,8 +179,10 @@ final class GrafileBlob extends GrafileValue {
 
 /// Cypher list.
 final class GrafileList extends GrafileValue {
+  /// Creates a list value.
   const GrafileList(this.items);
 
+  /// The list elements.
   final List<GrafileValue> items;
 
   @override
@@ -195,8 +208,10 @@ final class GrafileList extends GrafileValue {
 
 /// Cypher map.
 final class GrafileMap extends GrafileValue {
+  /// Creates a map value.
   const GrafileMap(this.entries);
 
+  /// The map entries.
   final Map<String, GrafileValue> entries;
 
   @override
@@ -226,14 +241,20 @@ final class GrafileMap extends GrafileValue {
 
 /// A node: identity, labels and properties.
 final class GrafileNode extends GrafileValue {
+  /// Creates a node value.
   const GrafileNode({
     required this.id,
     required this.labels,
     required this.properties,
   });
 
+  /// Node id.
   final int id;
+
+  /// Node labels.
   final List<String> labels;
+
+  /// Node properties.
   final Map<String, GrafileValue> properties;
 
   @override
@@ -264,6 +285,7 @@ final class GrafileNode extends GrafileValue {
 
 /// A relationship: identity, type, endpoint node ids and properties.
 final class GrafileEdge extends GrafileValue {
+  /// Creates an edge value.
   const GrafileEdge({
     required this.id,
     required this.type,
@@ -272,10 +294,19 @@ final class GrafileEdge extends GrafileValue {
     required this.properties,
   });
 
+  /// Edge id.
   final int id;
+
+  /// Relationship type, when known.
   final String? type;
+
+  /// Id of the start node.
   final int? start;
+
+  /// Id of the end node.
   final int? end;
+
+  /// Edge properties.
   final Map<String, GrafileValue> properties;
 
   @override
@@ -306,6 +337,7 @@ final class GrafileEdge extends GrafileValue {
 
 /// A point in space, as `{"srid", "x", "y"[, "z"]}` on the wire.
 final class GrafilePoint extends GrafileValue {
+  /// Creates a point value.
   const GrafilePoint({
     required this.srid,
     required this.x,
@@ -313,9 +345,16 @@ final class GrafilePoint extends GrafileValue {
     this.z,
   });
 
+  /// Spatial reference system id.
   final int srid;
+
+  /// X coordinate.
   final double x;
+
+  /// Y coordinate.
   final double y;
+
+  /// Z coordinate, for 3D points.
   final double? z;
 
   @override
@@ -337,8 +376,10 @@ final class GrafilePoint extends GrafileValue {
 /// Base class for the temporal values; [iso] is the ISO 8601 rendering used
 /// by the native serializers.
 sealed class GrafileTemporal extends GrafileValue {
+  /// Creates a temporal value from its ISO 8601 [iso] text.
   const GrafileTemporal(this.iso);
 
+  /// The ISO 8601 rendering of the value.
   final String iso;
 
   @override
@@ -354,6 +395,7 @@ sealed class GrafileTemporal extends GrafileValue {
 
 /// Cypher `DATE`, e.g. `2026-10-17`.
 final class GrafileDate extends GrafileTemporal {
+  /// Creates a date value from its ISO 8601 [iso] text.
   const GrafileDate(super.iso);
 
   /// The date parsed from [iso], when it is a valid calendar date.
@@ -362,16 +404,19 @@ final class GrafileDate extends GrafileTemporal {
 
 /// Cypher `LOCAL TIME`, e.g. `12:30:00.5`.
 final class GrafileLocalTime extends GrafileTemporal {
+  /// Creates a local time value from its ISO 8601 [iso] text.
   const GrafileLocalTime(super.iso);
 }
 
 /// Cypher `TIME`, an instant time with a UTC offset, e.g. `12:30:00+02:00`.
 final class GrafileTime extends GrafileTemporal {
+  /// Creates a time value from its ISO 8601 [iso] text.
   const GrafileTime(super.iso);
 }
 
 /// Cypher `LOCAL DATETIME`, e.g. `2026-10-17T12:30:00`.
 final class GrafileLocalDateTime extends GrafileTemporal {
+  /// Creates a local date and time value from its ISO 8601 [iso] text.
   const GrafileLocalDateTime(super.iso);
 
   /// The value parsed from [iso], when it is a valid date and time.
@@ -380,6 +425,7 @@ final class GrafileLocalDateTime extends GrafileTemporal {
 
 /// Cypher `DATETIME`, e.g. `2026-10-17T12:30:00Z`.
 final class GrafileDateTime extends GrafileTemporal {
+  /// Creates a date and time value from its ISO 8601 [iso] text.
   const GrafileDateTime(super.iso);
 
   /// The value parsed from [iso], when it is a valid date and time.
@@ -388,5 +434,6 @@ final class GrafileDateTime extends GrafileTemporal {
 
 /// Cypher `DURATION`, e.g. `P1DT2H`.
 final class GrafileDuration extends GrafileTemporal {
+  /// Creates a duration value from its ISO 8601 [iso] text.
   const GrafileDuration(super.iso);
 }

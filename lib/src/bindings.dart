@@ -105,6 +105,7 @@ typedef _ColumnTextDart = Pointer<Utf8> Function(Pointer<Void>, int);
 /// One instance is created per loaded dynamic library; all higher-level
 /// objects share it.
 final class GrafileBindings {
+  /// Looks up every `libgrafile` symbol in [library].
   GrafileBindings(this.library) {
     try {
       libversion = library.lookupFunction<_IntNative, _IntDart>(
@@ -186,9 +187,16 @@ final class GrafileBindings {
   /// The underlying dynamic library.
   final DynamicLibrary library;
 
+  /// `grafile_libversion`.
   late final int Function() libversion;
+
+  /// `grafile_version`.
   late final Pointer<Utf8> Function() versionString;
+
+  /// `grafile_free`.
   late final void Function(Pointer<Void>) free;
+
+  /// `grafile_open_v2`.
   late final int Function(
     Pointer<Utf8>,
     int,
@@ -196,10 +204,20 @@ final class GrafileBindings {
     Pointer<Pointer<Utf8>>,
   )
   openV2;
+
+  /// `grafile_close`.
   late final void Function(Pointer<Void>) close;
+
+  /// `grafile_errcode`.
   late final int Function(Pointer<Void>) errorCode;
+
+  /// `grafile_errmsg`.
   late final Pointer<Utf8> Function(Pointer<Void>) errorMessage;
+
+  /// `grafile_exec`.
   late final int Function(Pointer<Void>, Pointer<Utf8>, Pointer<Utf8>) exec;
+
+  /// `grafile_query_json`.
   late final int Function(
     Pointer<Void>,
     Pointer<Utf8>,
@@ -207,10 +225,20 @@ final class GrafileBindings {
     Pointer<Pointer<Utf8>>,
   )
   queryJson;
+
+  /// `grafile_meta_json`.
   late final int Function(Pointer<Void>, int, Pointer<Pointer<Utf8>>) metaJson;
+
+  /// `grafile_begin`.
   late final int Function(Pointer<Void>) begin;
+
+  /// `grafile_commit`.
   late final int Function(Pointer<Void>) commit;
+
+  /// `grafile_rollback`.
   late final int Function(Pointer<Void>) rollback;
+
+  /// `grafile_prepare`.
   late final int Function(
     Pointer<Void>,
     Pointer<Utf8>,
@@ -218,16 +246,38 @@ final class GrafileBindings {
     Pointer<Pointer<Utf8>>,
   )
   prepare;
+
+  /// `grafile_bind_params_json`.
   late final int Function(Pointer<Void>, Pointer<Utf8>) bindParamsJson;
+
+  /// `grafile_step`.
   late final int Function(Pointer<Void>) step;
+
+  /// `grafile_reset`.
   late final int Function(Pointer<Void>) reset;
+
+  /// `grafile_finalize`.
   late final void Function(Pointer<Void>) finalizeStatement;
+
+  /// `grafile_column_count`.
   late final int Function(Pointer<Void>) columnCount;
+
+  /// `grafile_column_name`.
   late final Pointer<Utf8> Function(Pointer<Void>, int) columnName;
+
+  /// `grafile_column_kind`.
   late final int Function(Pointer<Void>, int) columnKind;
+
+  /// `grafile_column_json`.
   late final int Function(Pointer<Void>, int, Pointer<Pointer<Utf8>>)
   columnJson;
+
+  /// `grafile_column_int64`.
   late final int Function(Pointer<Void>, int, Pointer<Int64>) columnInt64;
+
+  /// `grafile_column_double`.
   late final int Function(Pointer<Void>, int, Pointer<Double>) columnDouble;
+
+  /// `grafile_column_text`.
   late final Pointer<Utf8> Function(Pointer<Void>, int) columnText;
 }
