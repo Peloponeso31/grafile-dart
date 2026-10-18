@@ -224,6 +224,7 @@ void main() {
         expect(statement.step(), isTrue);
         expect(statement.columnKind(0), GrafileColumnKind.integer);
         expect(statement.getInt(0), 1);
+        expect(statement.getJson(0), 1);
         expect(statement.step(), isFalse);
 
         statement.reset();

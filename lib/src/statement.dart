@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:ffi';
-import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 
 import 'bindings.dart';
 import 'constants.dart';
 import 'database.dart';
+import 'decoding.dart';
 import 'exceptions.dart';
 import 'ffi_util.dart';
 import 'params.dart';
@@ -118,48 +118,18 @@ final class GrafileStatement {
         }
       case GrafileColumnKind.text:
         return GrafileText(_text(index) ?? '');
-      case GrafileColumnKind.blob:
-        final raw = _jsonRaw(index);
-        if (raw is! String) {
-          throw const GrafileException(
-            GrafileResult.mismatch,
-            'blob column did not serialize to a string',
-          );
-        }
-        return GrafileBlob(_decodeHex(raw));
-      case GrafileColumnKind.boolean:
-        final raw = _jsonRaw(index);
-        if (raw is! bool) {
-          throw const GrafileException(
-            GrafileResult.mismatch,
-            'boolean column did not serialize to a bool',
-          );
-        }
-        return GrafileBool(raw);
-      case GrafileColumnKind.list:
-      case GrafileColumnKind.map:
-        return GrafileValue.fromJson(_jsonRaw(index));
-      case GrafileColumnKind.node:
-        return _nodeFromJson(_jsonRaw(index));
-      case GrafileColumnKind.edge:
-        return _edgeFromJson(_jsonRaw(index));
-      case GrafileColumnKind.date:
-        return GrafileDate(_temporalText(index));
-      case GrafileColumnKind.localTime:
-        return GrafileLocalTime(_temporalText(index));
-      case GrafileColumnKind.time:
-        return GrafileTime(_temporalText(index));
-      case GrafileColumnKind.localDateTime:
-        return GrafileLocalDateTime(_temporalText(index));
-      case GrafileColumnKind.dateTime:
-        return GrafileDateTime(_temporalText(index));
-      case GrafileColumnKind.duration:
-        return GrafileDuration(_temporalText(index));
-      case GrafileColumnKind.point:
-        return _pointFromJson(_jsonRaw(index));
       default:
-        return GrafileValue.fromJson(_jsonRaw(index));
+        return decodeColumnValue(kind, getJson(index));
     }
+  }
+
+  /// Reads the current value at [index] as its JSON-decoded form.
+  ///
+  /// This is the raw transport used by the async worker; prefer [getValue]
+  /// for typed access.
+  Object? getJson(int index) {
+    _checkLive();
+    return _jsonRaw(index);
   }
 
   /// Reads the current value at [index] as an integer.
@@ -248,16 +218,7 @@ final class GrafileStatement {
 
   String? _text(int index) => borrowUtf8(_bindings.columnText(_handle, index));
 
-  String _temporalText(int index) {
-    final raw = _jsonRaw(index);
-    if (raw is! String) {
-      throw const GrafileException(
-        GrafileResult.mismatch,
-        'temporal column did not serialize to a string',
-      );
-    }
-    return raw;
-  }
+  String _temporalText(int index) => temporalText(_jsonRaw(index));
 
   Object? _jsonRaw(int index) {
     final out = calloc<Pointer<Utf8>>();
@@ -268,74 +229,6 @@ final class GrafileStatement {
     } finally {
       calloc.free(out);
     }
-  }
-
-  GrafileNode _nodeFromJson(Object? raw) {
-    if (raw is! Map) {
-      throw const GrafileException(
-        GrafileResult.mismatch,
-        'node column did not serialize to an object',
-      );
-    }
-    return GrafileNode(
-      id: raw['id'] as int,
-      labels: [for (final label in raw['labels'] as List) label as String],
-      properties: _properties(raw['properties']),
-    );
-  }
-
-  GrafileEdge _edgeFromJson(Object? raw) {
-    if (raw is! Map) {
-      throw const GrafileException(
-        GrafileResult.mismatch,
-        'edge column did not serialize to an object',
-      );
-    }
-    return GrafileEdge(
-      id: raw['id'] as int,
-      type: raw['type'] as String?,
-      start: raw['start'] as int?,
-      end: raw['end'] as int?,
-      properties: _properties(raw['properties']),
-    );
-  }
-
-  GrafilePoint _pointFromJson(Object? raw) {
-    if (raw is! Map) {
-      throw const GrafileException(
-        GrafileResult.mismatch,
-        'point column did not serialize to an object',
-      );
-    }
-    return GrafilePoint(
-      srid: raw['srid'] as int,
-      x: (raw['x'] as num).toDouble(),
-      y: (raw['y'] as num).toDouble(),
-      z: raw['z'] == null ? null : (raw['z'] as num).toDouble(),
-    );
-  }
-
-  static Map<String, GrafileValue> _properties(Object? raw) {
-    if (raw is! Map) return const {};
-    return {
-      for (final entry in raw.entries)
-        entry.key.toString(): GrafileValue.fromJson(entry.value),
-    };
-  }
-
-  static Uint8List _decodeHex(String value) {
-    final hex = value.startsWith('0x') ? value.substring(2) : value;
-    if (hex.length.isOdd) {
-      throw const GrafileException(
-        GrafileResult.mismatch,
-        'blob hex string has odd length',
-      );
-    }
-    final bytes = Uint8List(hex.length ~/ 2);
-    for (var i = 0; i < bytes.length; i++) {
-      bytes[i] = int.parse(hex.substring(i * 2, i * 2 + 2), radix: 16);
-    }
-    return bytes;
   }
 }
 

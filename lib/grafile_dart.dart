@@ -19,6 +19,7 @@
 /// ```
 library;
 
+export 'src/async/async_database.dart' show AsyncGrafile, AsyncGrafileDb;
 export 'src/constants.dart'
     show GrafileColumnKind, GrafileOpenFlags, GrafileResult;
 export 'src/database.dart' show Grafile, GrafileDb;

@@ -100,6 +100,38 @@ Concurrency follows grafile: one writer at a time across processes and within
 a process (a second writer gets `GrafileBusyException`); readers run
 concurrently and always observe committed state.
 
+### Async usage
+
+Every synchronous call blocks the calling isolate. `AsyncGrafile` moves the
+native handle into a dedicated worker isolate, so Flutter frames and event
+loops stay responsive:
+
+```dart
+final db = await AsyncGrafile.open('graph.grafile');
+
+await db.exec("CREATE (:Person {name: 'alice'})");
+final rows = await db.query('MATCH (p:Person) RETURN p.name AS name');
+await db.transaction(() async {
+  await db.exec("CREATE (:Person {name: 'bob'})");
+});
+await db.dispose();
+```
+
+`AsyncGrafileDb` mirrors the sync surface: `exec`, `query`, `queryJson`,
+`meta`, `begin`/`commit`/`rollback`, `transaction`. Prepared statements are
+not exposed asynchronously; use `query`/`queryJson`.
+
+Semantics:
+
+- One worker isolate per `AsyncGrafileDb`; commands on one handle are
+  processed in order, so no two native calls ever overlap.
+- While a transaction is open, every subsequent command on that handle
+  belongs to it. Use one handle per concurrent writer.
+- Errors are rebuilt on the caller side with their original type, code,
+  message and stack trace.
+- `dispose()` shuts the worker down; a finalizer sends a best-effort close if
+  a handle is garbage-collected.
+
 ### Values
 
 `GrafileValue` is a sealed hierarchy: `GrafileNull`, `GrafileInt`,
@@ -135,10 +167,10 @@ stay usable after their connection is disposed, matching the C ABI.
 
 ## Limitations
 
-- All calls are synchronous and block the calling isolate; run large queries
-  on a worker isolate if that matters.
+- All native calls are synchronous and block the calling isolate; use the
+  `AsyncGrafile` worker API to keep event loops responsive.
 - Result rows are materialized by grafile before the first `step`, so very
-  large results use memory proportional to their size.
+  large results use memory proportional to their size (both APIs).
 - The JSON parameter channel cannot carry typed durations or points; build
   them in Cypher (`duration($text)`, `point({x: $x, y: $y})`).
 - `grafile_column_json` is the value transport; it must be present in the
@@ -153,6 +185,7 @@ $ dart test                              # integration tests use grafile's
                                          # discovery; set GRAFILE_LIBRARY to
                                          # point at a specific build
 $ dart run example/grafile_dart_example.dart
+$ dart run example/grafile_dart_async_example.dart
 ```
 
 ## License

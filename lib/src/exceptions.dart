@@ -117,6 +117,16 @@ final class GrafileLibraryException implements Exception {
   String toString() => 'GrafileLibraryException: $message';
 }
 
+/// An error crossed the async worker boundary without a known Dart type.
+final class GrafileRemoteException implements Exception {
+  const GrafileRemoteException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => 'GrafileRemoteException: $message';
+}
+
 /// No `libgrafile` was found in any of the searched locations.
 final class GrafileLibraryNotFoundException implements Exception {
   const GrafileLibraryNotFoundException(this.tried);
