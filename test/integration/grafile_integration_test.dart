@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:grafile_dart/grafile_dart.dart';
+import 'package:grafile/grafile.dart';
 import 'package:test/test.dart';
 
 bool _libraryAvailable() {
@@ -23,7 +23,7 @@ void main() {
       late GrafileDb db;
 
       setUp(() {
-        directory = Directory.systemTemp.createTempSync('grafile_dart_test');
+        directory = Directory.systemTemp.createTempSync('grafile_test');
         dbPath = '${directory.path}${Platform.pathSeparator}test.grafile';
         db = Grafile.open(dbPath);
         addTearDown(db.dispose);

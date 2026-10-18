@@ -4,7 +4,7 @@
 /// order), opens databases and runs Cypher queries:
 ///
 /// ```dart
-/// import 'package:grafile_dart/grafile_dart.dart';
+/// import 'package:grafile/grafile.dart';
 ///
 /// void main() {
 ///   final db = Grafile.open('graph.grafile');
@@ -20,6 +20,7 @@
 library;
 
 export 'src/async/async_database.dart' show AsyncGrafile, AsyncGrafileDb;
+export 'src/bindings.dart' show GrafileBindings;
 export 'src/constants.dart'
     show GrafileColumnKind, GrafileOpenFlags, GrafileResult;
 export 'src/database.dart' show Grafile, GrafileDb;

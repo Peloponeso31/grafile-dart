@@ -1,8 +1,9 @@
-## 0.1.0
+## 0.2.1
 
-* Initial release: a pure Dart driver for grafile over its C ABI (`libgrafile`).
-* `Grafile.open` / `GrafileDb` with `exec`, typed `query`, `queryJson`, `meta`,
-  `prepare` and `begin` / `commit` / `rollback` / `transaction`.
+First pub.dev release of the Dart driver for grafile, tracking grafile 0.2.1.
+
+* `Grafile.open` / `GrafileDb` with `exec`, typed `query`, `queryJson`,
+  `meta`, `prepare` and `begin` / `commit` / `rollback` / `transaction`.
 * `GrafileStatement` with parameter binding, stepping, column metadata and
   kind-driven value decoding.
 * `GrafileValue` model: null, int, float, text, blob, bool, list, map, node,

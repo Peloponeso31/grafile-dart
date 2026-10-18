@@ -24,7 +24,7 @@ final class AsyncGrafile {
 
   /// Opens (or creates) the database at [path] in a dedicated worker isolate.
   ///
-  /// [readOnly], [create] and [libraryPath] behave like [Grafile.open].
+  /// [readOnly], [create] and [libraryPath] behave like `Grafile.open`.
   static Future<AsyncGrafileDb> open(
     String path, {
     bool readOnly = false,
@@ -37,7 +37,7 @@ final class AsyncGrafile {
       isolate = await Isolate.spawn<GrafileWorkerMessage>(grafileWorkerEntry, (
         reply.sendPort,
         (path, readOnly, create, libraryPath),
-      ), debugName: 'grafile_dart: $path');
+      ), debugName: 'grafile: $path');
     } catch (_) {
       reply.close();
       rethrow;
@@ -62,8 +62,8 @@ final class AsyncGrafile {
 
 /// A connection to one grafile database served by a worker isolate.
 ///
-/// Methods mirror [GrafileDb] but return [Future]s. A thrown
-/// [GrafileException] on the worker side is rebuilt here with the same type,
+/// Methods mirror `GrafileDb` but return [Future]s. A thrown
+/// `GrafileException` on the worker side is rebuilt here with the same type,
 /// code, message and stack trace.
 ///
 /// While a transaction is open, every subsequent command on this handle

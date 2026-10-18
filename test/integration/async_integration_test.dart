@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:grafile_dart/grafile_dart.dart';
+import 'package:grafile/grafile.dart';
 import 'package:test/test.dart';
 
 bool _libraryAvailable() {
@@ -24,9 +24,7 @@ void main() {
       late AsyncGrafileDb db;
 
       setUp(() async {
-        directory = Directory.systemTemp.createTempSync(
-          'grafile_dart_async_test',
-        );
+        directory = Directory.systemTemp.createTempSync('grafile_async_test');
         dbPath = '${directory.path}${Platform.pathSeparator}test.grafile';
         db = await AsyncGrafile.open(dbPath);
         addTearDown(db.dispose);

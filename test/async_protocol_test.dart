@@ -1,5 +1,5 @@
-import 'package:grafile_dart/grafile_dart.dart';
-import 'package:grafile_dart/src/async/protocol.dart';
+import 'package:grafile/grafile.dart';
+import 'package:grafile/src/async/protocol.dart';
 import 'package:test/test.dart';
 
 void main() {

@@ -1,7 +1,13 @@
-name: grafile_dart
+name: grafile
 description: Dart driver for grafile, the single-file graph database, over its C FFI.
-version: 0.1.0
-repository: https://github.com/Peloponeso31/grafile_dart
+version: 0.2.1
+repository: https://github.com/Peloponeso31/grafile-dart
+issue_tracker: https://github.com/Peloponeso31/grafile-dart/issues
+topics:
+  - database
+  - graph
+  - ffi
+  - cypher
 
 environment:
   sdk: ^3.12.0

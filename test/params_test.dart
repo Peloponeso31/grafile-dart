@@ -1,4 +1,4 @@
-import 'package:grafile_dart/src/params.dart';
+import 'package:grafile/src/params.dart';
 import 'package:test/test.dart';
 
 void main() {

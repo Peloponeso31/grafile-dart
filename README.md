@@ -1,11 +1,14 @@
-# grafile_dart
+# grafile
+
+[![pub package](https://img.shields.io/pub/v/grafile.svg)](https://pub.dev/packages/grafile)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Dart driver for [grafile](https://github.com/Peloponeso31/grafile), the
 single-file graph database, over its C ABI (`libgrafile`). Works in Dart CLI
 apps, servers and Flutter apps.
 
 ```dart
-import 'package:grafile_dart/grafile_dart.dart';
+import 'package:grafile/grafile.dart';
 
 void main() {
   final db = Grafile.open('graph.grafile');
@@ -21,7 +24,13 @@ void main() {
 }
 ```
 
-## Install the native library
+## Install
+
+Add the package:
+
+```console
+$ dart pub add grafile
+```
 
 The driver needs `libgrafile` (shared library) on the machine. Install grafile
 with its installer:
@@ -51,7 +60,7 @@ that was tried. If no library is available at all, integration tests and
 queries fail at the first call, so you can probe with:
 
 ```dart
-print(Grafile.version); // e.g. 0.2.0
+print(Grafile.version); // e.g. 0.2.1
 ```
 
 ## Usage
@@ -184,8 +193,8 @@ $ dart analyze
 $ dart test                              # integration tests use grafile's
                                          # discovery; set GRAFILE_LIBRARY to
                                          # point at a specific build
-$ dart run example/grafile_dart_example.dart
-$ dart run example/grafile_dart_async_example.dart
+$ dart run example/grafile_example.dart
+$ dart run example/grafile_async_example.dart
 ```
 
 ## License
