@@ -60,7 +60,7 @@ that was tried. If no library is available at all, integration tests and
 queries fail at the first call, so you can probe with:
 
 ```dart
-print(Grafile.version); // e.g. 0.2.1
+print(Grafile.version); // e.g. 0.2.2
 ```
 
 ## Usage
