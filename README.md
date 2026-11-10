@@ -49,11 +49,17 @@ When building grafile from source, `cargo build -p grafile-ffi` produces
 
 1. `libraryPath:` given to `Grafile.open`;
 2. the `GRAFILE_LIBRARY` environment variable;
-3. the platform loader search path (`DYLD_LIBRARY_PATH`, `LD_LIBRARY_PATH`,
-   Windows `PATH`);
-4. common install locations: `$GRAFILE_PREFIX/lib` (default `~/.local/lib`),
-   `/usr/local/lib`, `/opt/homebrew/lib`, `/usr/lib`, and `lib/` directories
-   next to every entry of `PATH`.
+3. otherwise, the newest installed grafile. Every location below is probed
+   and the library reporting the highest version wins (ties go to the
+   earlier location):
+   - the platform loader search path (`DYLD_LIBRARY_PATH`, `LD_LIBRARY_PATH`,
+     Windows `PATH`);
+   - common install locations: `$GRAFILE_PREFIX/lib` (default `~/.local/lib`),
+     `/usr/local/lib`, `/opt/homebrew/lib`, `/usr/lib`, and `lib/`
+     directories next to every entry of `PATH`.
+
+An explicit `libraryPath:` or `GRAFILE_LIBRARY` always loads exactly that
+library, even when a newer one is installed elsewhere.
 
 When nothing loads, a `GrafileLibraryNotFoundException` lists every location
 that was tried. If no library is available at all, integration tests and

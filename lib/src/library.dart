@@ -16,15 +16,18 @@ String get nativeLibraryFileName {
 /// Resolution order:
 /// 1. [libraryPath], when given (a file path or a library name);
 /// 2. the `GRAFILE_LIBRARY` environment variable;
-/// 3. the platform loader search path (`DYLD_LIBRARY_PATH`, `LD_LIBRARY_PATH`,
-///    `PATH` on Windows);
-/// 4. common install locations: `$GRAFILE_PREFIX/lib` (default `~/.local/lib`),
-///    `/usr/local/lib`, `/opt/homebrew/lib`, `/usr/lib` and every `lib/`
-///    directory next to an entry of `PATH`.
+/// 3. otherwise, the newest installed grafile: every location below is
+///    probed and the library reporting the highest `grafile_libversion` wins
+///    (ties go to the earlier location):
+///    - the platform loader search path (`DYLD_LIBRARY_PATH`,
+///      `LD_LIBRARY_PATH`, `PATH` on Windows);
+///    - common install locations: `$GRAFILE_PREFIX/lib` (default
+///      `~/.local/lib`), `/usr/local/lib`, `/opt/homebrew/lib`, `/usr/lib`
+///      and every `lib/` directory next to an entry of `PATH`.
 ///
 /// Throws [GrafileLibraryNotFoundException] when nothing loads and
-/// [GrafileLibraryException] when the library loads but lacks required
-/// symbols.
+/// [GrafileLibraryException] when a library loads but lacks required
+/// symbols and no usable library was found elsewhere.
 GrafileBindings loadGrafileBindings({String? libraryPath}) {
   final fileName = nativeLibraryFileName;
 
@@ -41,15 +44,60 @@ GrafileBindings loadGrafileBindings({String? libraryPath}) {
     throw GrafileLibraryNotFoundException([fromEnvironment]);
   }
 
-  final byLoaderPath = _tryOpen(fileName);
-  if (byLoaderPath != null) return byLoaderPath;
-
   final tried = <String>[fileName, ..._candidates(fileName)];
-  for (final candidate in tried.skip(1)) {
-    final bindings = _tryOpen(candidate);
-    if (bindings != null) return bindings;
-  }
+  final newest = _newest(tried);
+  if (newest != null) return newest;
   throw GrafileLibraryNotFoundException(tried);
+}
+
+/// Opens every loadable library in [candidates] and returns the bindings of
+/// the one with the highest `grafile_libversion`, closing the others.
+///
+/// Libraries missing required symbols are skipped; if no usable library is
+/// found, the first such [GrafileLibraryException] is rethrown.
+GrafileBindings? _newest(List<String> candidates) {
+  GrafileBindings? best;
+  var bestVersion = -1;
+  GrafileLibraryException? incompatible;
+
+  for (final candidate in candidates) {
+    final DynamicLibrary library;
+    try {
+      library = DynamicLibrary.open(candidate);
+    } catch (_) {
+      continue;
+    }
+
+    final GrafileBindings bindings;
+    final int version;
+    try {
+      bindings = GrafileBindings(library);
+      version = bindings.libversion();
+    } on GrafileLibraryException catch (error) {
+      incompatible ??= error;
+      _close(library);
+      continue;
+    }
+
+    if (version > bestVersion) {
+      if (best != null) _close(best.library);
+      best = bindings;
+      bestVersion = version;
+    } else {
+      _close(library);
+    }
+  }
+
+  if (best == null && incompatible != null) throw incompatible;
+  return best;
+}
+
+void _close(DynamicLibrary library) {
+  try {
+    library.close();
+  } catch (_) {
+    // Some platforms cannot unload libraries; leaving it loaded is harmless.
+  }
 }
 
 GrafileBindings? _tryOpen(String path) {

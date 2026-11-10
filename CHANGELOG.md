@@ -1,3 +1,13 @@
+## 1.0.0
+
+First stable release. The public API is unchanged from 0.2.2 and is now
+covered by semantic versioning.
+
+* Library discovery now loads the newest installed `libgrafile`: every
+  search location is probed and the highest `grafile_libversion` wins,
+  instead of the first library found. `libraryPath` and `GRAFILE_LIBRARY`
+  still load exactly the given library.
+
 ## 0.2.2
 
 Tracks grafile 0.2.2. The C ABI is unchanged, so this release only moves the
